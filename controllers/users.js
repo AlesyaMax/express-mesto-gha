@@ -50,16 +50,16 @@ module.exports.createUser = async (req, res) => {
 
 module.exports.editUserInfo = async (req, res) => {
   try {
-    const { name, about } = req.body;
+    const { newName, newAbout } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user,
       {
-        name,
-        about,
+        name: newName,
+        about: newAbout,
       },
       { new: true },
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
-    return res.status(201).send(updatedUser);
+    return res.status(200).send(updatedUser);
   } catch (error) {
     switch (error.name) {
       case "CastError":
@@ -80,15 +80,15 @@ module.exports.editUserInfo = async (req, res) => {
 
 module.exports.editAvatar = async (req, res) => {
   try {
-    const { avatar } = req.body;
+    const { newAvatar } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user,
       {
-        avatar,
+        avatar: newAvatar,
       },
       { new: true },
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
-    return res.status(201).send(updatedUser);
+    return res.status(200).send(updatedUser);
   } catch (error) {
     switch (error.name) {
       case "CastError":

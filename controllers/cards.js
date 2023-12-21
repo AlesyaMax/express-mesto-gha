@@ -50,12 +50,12 @@ module.exports.deleteCard = async (req, res) => {
 
 module.exports.likeCard = async (req, res) => {
   try {
-    const updatedLikes = await Card.findByIdAndUpdate(
+    await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     ).orFail(() => new NotFoundError("Передан несуществующий _id карточки"));
-    return res.status(200).send(updatedLikes);
+    return res.status(200).send("Лайк добавлен");
   } catch (error) {
     switch (error.name) {
       case "CastError":
@@ -72,12 +72,12 @@ module.exports.likeCard = async (req, res) => {
 
 module.exports.dislikeCard = async (req, res) => {
   try {
-    const updatedLikes = await Card.findByIdAndUpdate(
+    await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
     ).orFail(() => new NotFoundError("Передан несуществующий _id карточки"));
-    return res.status(200).send(updatedLikes);
+    return res.status(200).send("Лайк удален");
   } catch (error) {
     switch (error.name) {
       case "CastError":
