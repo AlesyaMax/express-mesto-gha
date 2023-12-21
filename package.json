@@ -1,0 +1,33 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "[![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml) # Проект Mesto фронтенд + бэкенд",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon --inspect -- app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlesyaMax/express-mesto-gha.git"
+  },
+  "author": "Alesya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlesyaMax/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/AlesyaMax/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "core-js": "^3.32.2",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3"
+  }
+}
