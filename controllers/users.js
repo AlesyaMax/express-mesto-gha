@@ -14,7 +14,7 @@ module.exports.getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId).orFail(
-      () => new NotFoundError("Пользователь с указанным _id не найден"),
+      () => new NotFoundError("Пользователь с указанным _id не найден")
     );
     return res.status(200).send(user);
   } catch (error) {
@@ -50,14 +50,14 @@ module.exports.createUser = async (req, res) => {
 
 module.exports.editUserInfo = async (req, res) => {
   try {
-    const { newName, newAbout } = req.body;
+    const { name, about } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user,
       {
-        name: newName,
-        about: newAbout,
+        name,
+        about,
       },
-      { new: true },
+      { new: true, runValidators: true }
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
     return res.status(200).send(updatedUser);
   } catch (error) {
@@ -80,13 +80,13 @@ module.exports.editUserInfo = async (req, res) => {
 
 module.exports.editAvatar = async (req, res) => {
   try {
-    const { newAvatar } = req.body;
+    const { avatar } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user,
       {
-        avatar: newAvatar,
+        avatar,
       },
-      { new: true },
+      { new: true, runValidators: true }
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
     return res.status(200).send(updatedUser);
   } catch (error) {

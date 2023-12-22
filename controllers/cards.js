@@ -33,13 +33,18 @@ module.exports.getCards = async (req, res) => {
 module.exports.deleteCard = async (req, res) => {
   try {
     const cardToDelete = await Card.findByIdAndDelete(req.params.cardId).orFail(
-      () => new NotFoundError("Карточка с указанным _id не найдена"),
+      () =>
+        new NotFoundError({ message: "Карточка с указанным _id не найдена" })
     );
-    return res.status(200).send(`Карточка ${cardToDelete._id}успешно удалена`);
+    return res
+      .status(200)
+      .send({ message: `Карточка ${cardToDelete._id}успешно удалена` });
   } catch (error) {
     switch (error.name) {
       case "CastError":
-        return res.status(404).send("Карточка с указанным _id не найдена");
+        return res
+          .status(404)
+          .send({ message: "Карточка с указанным _id не найдена" });
       case "NotFoundError":
         return res.status(error.statusCode).send(error.message);
       default:
@@ -53,15 +58,18 @@ module.exports.likeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError("Передан несуществующий _id карточки"));
-    return res.status(200).send("Лайк добавлен");
+      { new: true }
+    ).orFail(
+      () =>
+        new NotFoundError({ message: "Передан несуществующий _id карточки" })
+    );
+    return res.status(200).send({ message: "Лайк добавлен" });
   } catch (error) {
     switch (error.name) {
       case "CastError":
-        return res
-          .status(400)
-          .send("Переданы некорректные данные для постановки лайка");
+        return res.status(400).send({
+          message: "Переданы некорректные данные для постановки лайка",
+        });
       case "NotFoundError":
         return res.status(error.statusCode).send(error.message);
       default:
@@ -75,15 +83,18 @@ module.exports.dislikeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError("Передан несуществующий _id карточки"));
-    return res.status(200).send("Лайк удален");
+      { new: true }
+    ).orFail(
+      () =>
+        new NotFoundError({ message: "Передан несуществующий _id карточки" })
+    );
+    return res.status(200).send({ message: "Лайк удален" });
   } catch (error) {
     switch (error.name) {
       case "CastError":
         return res
           .status(400)
-          .send("Переданы некорректные данные для снятия лайка");
+          .send({ message: "Переданы некорректные данные для снятия лайка" });
       case "NotFoundError":
         return res.status(error.statusCode).send(error.message);
       default:
