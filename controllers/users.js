@@ -14,7 +14,7 @@ module.exports.getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId).orFail(
-      () => new NotFoundError("Пользователь с указанным _id не найден")
+      () => new NotFoundError("Пользователь с указанным _id не найден"),
     );
     return res.status(200).send(user);
   } catch (error) {
@@ -57,7 +57,7 @@ module.exports.editUserInfo = async (req, res) => {
         name,
         about,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
     return res.status(200).send(updatedUser);
   } catch (error) {
@@ -86,7 +86,7 @@ module.exports.editAvatar = async (req, res) => {
       {
         avatar,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).orFail(() => new NotFoundError("Пользователь с указанным _id не найден"));
     return res.status(200).send(updatedUser);
   } catch (error) {

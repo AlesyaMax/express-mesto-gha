@@ -6,7 +6,6 @@
         "error",
         { "allow": ["_id"] }
       ],
-      "quotes": ["error", "double"],
-      "comma-dangle": ["error", {"array": "always"}]
+      "quotes": ["error", "double"]
     }
 }
