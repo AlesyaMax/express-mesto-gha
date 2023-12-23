@@ -6,6 +6,6 @@
         "error",
         { "allow": ["_id"] }
       ],
-      "quotes": ["error", "double"]
+      "quotes": ["error", "single"]
     }
 }
