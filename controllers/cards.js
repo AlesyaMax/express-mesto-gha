@@ -1,5 +1,6 @@
-const Card = require('../models/card');
-const NotFoundError = require('../utils/NotFoundError');
+const Card = require("../models/card");
+const AuthError = require("../utils/AuthError");
+const NotFoundError = require("../utils/NotFoundError");
 
 module.exports.createCard = async (req, res) => {
   try {
@@ -9,13 +10,13 @@ module.exports.createCard = async (req, res) => {
     return res.send(newCard);
   } catch (error) {
     switch (error.name) {
-      case 'ValidationError':
+      case "ValidationError":
         return res.status(400).send({
           message: error.message,
         });
       default:
         return res.status(500).send({
-          message: 'На сервере произошла ошибка',
+          message: "На сервере произошла ошибка",
         });
     }
   }
@@ -26,26 +27,34 @@ module.exports.getCards = async (req, res) => {
     const cards = await Card.find({});
     return res.send(cards);
   } catch (error) {
-    return res.status(500).send({ message: 'На сервере произошла ошибка' });
+    return res.status(500).send({ message: "На сервере произошла ошибка" });
   }
 };
 
 module.exports.deleteCard = async (req, res) => {
   try {
     const cardToDelete = await Card.findByIdAndDelete(req.params.cardId).orFail(
-      () => new NotFoundError({ message: 'Карточка с указанным _id не найдена' }),
+      () =>
+        new NotFoundError({ message: "Карточка с указанным _id не найдена" })
     );
-    return res.send({ message: `Карточка ${cardToDelete._id}успешно удалена` });
+    if (req.user._id !== cardToDelete.owner) {
+      throw new AuthError("Нет прав на удаление карточки");
+    }
+    return res.send({
+      message: `Карточка ${cardToDelete._id} успешно удалена`,
+    });
   } catch (error) {
     switch (error.name) {
-      case 'CastError':
+      case "CastError":
         return res.status(400).send({
-          message: 'Переданы некорректные данные для удаления карточки',
+          message: "Переданы некорректные данные для удаления карточки",
         });
-      case 'NotFoundError':
+      case "NotFoundError":
+        return res.status(error.statusCode).send(error.message);
+      case "AuthError":
         return res.status(error.statusCode).send(error.message);
       default:
-        return res.status(500).send({ message: 'На сервере произошла ошибка' });
+        return res.status(500).send({ message: "На сервере произошла ошибка" });
     }
   }
 };
@@ -55,21 +64,22 @@ module.exports.likeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true },
+      { new: true }
     ).orFail(
-      () => new NotFoundError({ message: 'Передан несуществующий _id карточки' }),
+      () =>
+        new NotFoundError({ message: "Передан несуществующий _id карточки" })
     );
-    return res.send({ message: 'Лайк добавлен' });
+    return res.send({ message: "Лайк добавлен" });
   } catch (error) {
     switch (error.name) {
-      case 'CastError':
+      case "CastError":
         return res.status(400).send({
-          message: 'Переданы некорректные данные для постановки лайка',
+          message: "Переданы некорректные данные для постановки лайка",
         });
-      case 'NotFoundError':
+      case "NotFoundError":
         return res.status(error.statusCode).send(error.message);
       default:
-        return res.status(500).send({ message: 'На сервере произошла ошибка' });
+        return res.status(500).send({ message: "На сервере произошла ошибка" });
     }
   }
 };
@@ -79,21 +89,22 @@ module.exports.dislikeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true },
+      { new: true }
     ).orFail(
-      () => new NotFoundError({ message: 'Передан несуществующий _id карточки' }),
+      () =>
+        new NotFoundError({ message: "Передан несуществующий _id карточки" })
     );
-    return res.send({ message: 'Лайк удален' });
+    return res.send({ message: "Лайк удален" });
   } catch (error) {
     switch (error.name) {
-      case 'CastError':
+      case "CastError":
         return res
           .status(400)
-          .send({ message: 'Переданы некорректные данные для снятия лайка' });
-      case 'NotFoundError':
+          .send({ message: "Переданы некорректные данные для снятия лайка" });
+      case "NotFoundError":
         return res.status(error.statusCode).send(error.message);
       default:
-        return res.status(500).send({ message: 'На сервере произошла ошибка' });
+        return res.status(500).send({ message: "На сервере произошла ошибка" });
     }
   }
 };
