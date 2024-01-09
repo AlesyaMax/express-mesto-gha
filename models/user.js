@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -23,6 +25,7 @@ const userSchema = mongoose.Schema(
       },
       default:
         'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      match: regex,
     },
     email: {
       type: String,
