@@ -10,7 +10,7 @@ const {
 } = require('../controllers/users');
 
 const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
-const regexId = /[0-1a-f]{24}/;
+const regexId = /[0-9a-f]{24}/;
 
 router.get(
   '/',
