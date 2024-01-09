@@ -11,12 +11,7 @@ module.exports = (req, res, next) => {
     const validToken = token.replace('jwt=', '');
     payload = jwt.verify(validToken, 'dev_secret');
   } catch (error) {
-    switch (error.name) {
-      case 'AuthError':
-        return res.status(error.statusCode).send({ message: error.message });
-      default:
-        return res.status(500).send({ message: error.message });
-    }
+    next(error);
   }
   req.user = payload;
 
