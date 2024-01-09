@@ -32,12 +32,13 @@ module.exports.deleteCard = async (req, res, next) => {
     const cardToDelete = await Card.findByIdAndDelete(req.params.cardId).orFail(
       () => new NotFoundError('Карточка с указанным _id не найдена'),
     );
-    if (req.user._id !== cardToDelete.owner) {
+    if (req.user._id !== `${cardToDelete.owner}`) {
       throw new AccessError('Нет прав на удаление карточки');
+    } else {
+      return res.status(200).send({
+        message: `Карточка ${cardToDelete._id} успешно удалена`,
+      });
     }
-    return res.status(200).send({
-      message: `Карточка ${cardToDelete._id} успешно удалена`,
-    });
   } catch (error) {
     next(error);
   }
