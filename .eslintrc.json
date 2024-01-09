@@ -6,6 +6,7 @@
         "error",
         { "allow": ["_id"] }
       ],
-      "quotes": ["error", "single"]
+      "quotes": ["error", "single"],
+      "consistent-return": "off"
     }
 }
