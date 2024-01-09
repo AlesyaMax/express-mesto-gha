@@ -1,5 +1,5 @@
-const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
+const router = require("express").Router();
+const { celebrate, Joi } = require("celebrate");
 const {
   getUsers,
   getUserById,
@@ -7,12 +7,14 @@ const {
   editAvatar,
   // deleteUserById,
   getUser,
-} = require('../controllers/users');
+} = require("../controllers/users");
 
-const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const regex =
+  /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const regexId = /[0-9a-f]{24}/;
 
 router.get(
-  '/',
+  "/",
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
@@ -22,43 +24,43 @@ router.get(
       password: Joi.string().required(),
     }),
   }),
-  getUsers,
+  getUsers
 );
 router.get(
-  '/me',
+  "/me",
   celebrate({
     body: Joi.object().keys({
       _id: Joi.string().required(),
     }),
   }),
-  getUser,
+  getUser
 );
 router.get(
-  '/:userId',
+  "/:userId",
   celebrate({
     params: Joi.object().keys({
-      userId: Joi.string().required(),
+      userId: Joi.string().required().regex(regexId),
     }),
   }),
-  getUserById,
+  getUserById
 );
 
 router.patch(
-  '/me',
+  "/me",
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
     }),
   }),
-  editUserInfo,
+  editUserInfo
 );
 router.patch(
-  '/me/avatar',
+  "/me/avatar",
   celebrate({
     body: Joi.object().keys({ avatar: Joi.string().required().regex(regex) }),
   }),
-  editAvatar,
+  editAvatar
 );
 
 // router.delete('/:userId', deleteUserById);
