@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
   try {
     const token = req.headers.cookie;
     if (!token) {
-      throw new AuthError('Что-то не так с токеном');
+      throw new AuthError('Неправильные почта или пароль');
     }
     const validToken = token.replace('jwt=', '');
     payload = jwt.verify(validToken, 'dev_secret');
