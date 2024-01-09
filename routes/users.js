@@ -10,6 +10,7 @@ const {
 } = require('../controllers/users');
 
 const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const regexId = /[0-1a-f]{24}/;
 
 router.get(
   '/',
@@ -37,7 +38,7 @@ router.get(
   '/:userId',
   celebrate({
     params: Joi.object().keys({
-      userId: Joi.string().required(),
+      userId: Joi.string().required().regex(regexId),
     }),
   }),
   getUserById,

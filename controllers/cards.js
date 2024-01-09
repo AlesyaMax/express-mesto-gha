@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const AuthError = require('../utils/AuthError');
+const AccessError = require('../utils/AccessError');
 const NotFoundError = require('../utils/NotFoundError');
 
 module.exports.createCard = async (req, res, next) => {
@@ -30,10 +30,10 @@ module.exports.getCards = async (req, res, next) => {
 module.exports.deleteCard = async (req, res, next) => {
   try {
     const cardToDelete = await Card.findByIdAndDelete(req.params.cardId).orFail(
-      () => new NotFoundError({ message: 'Карточка с указанным _id не найдена' }),
+      () => new NotFoundError('Карточка с указанным _id не найдена'),
     );
     if (req.user._id !== cardToDelete.owner) {
-      throw new AuthError('Нет прав на удаление карточки');
+      throw new AccessError('Нет прав на удаление карточки');
     }
     return res.send({
       message: `Карточка ${cardToDelete._id} успешно удалена`,
@@ -49,9 +49,7 @@ module.exports.likeCard = async (req, res, next) => {
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
-    ).orFail(
-      () => new NotFoundError({ message: 'Передан несуществующий _id карточки' }),
-    );
+    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
     return res.send({ message: 'Лайк добавлен' });
   } catch (error) {
     if (error.name === 'CastError') {
@@ -69,9 +67,7 @@ module.exports.dislikeCard = async (req, res, next) => {
       req.params.cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
-    ).orFail(
-      () => new NotFoundError({ message: 'Передан несуществующий _id карточки' }),
-    );
+    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
     return res.send({ message: 'Лайк удален' });
   } catch (error) {
     if (error.name === 'CastError') {
