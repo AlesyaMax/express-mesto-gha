@@ -4,7 +4,7 @@ const AuthError = require('../utils/AuthError');
 module.exports = (req, res, next) => {
   let payload;
   try {
-    const token = req.headers.cookie;
+    const token = req.cookies.jwt;
     if (!token) {
       throw new AuthError('Неправильные почта или пароль');
     }

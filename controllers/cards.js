@@ -28,14 +28,17 @@ module.exports.getCards = async (req, res, next) => {
 
 module.exports.deleteCard = async (req, res, next) => {
   try {
-    const cardToDelete = await Card.findByIdAndDelete(req.params.cardId).orFail(
+    const cardToDelete = await Card.findById(req.params.cardId).orFail(
       () => new NotFoundError('Карточка с указанным _id не найдена'),
     );
     if (req.user._id !== `${cardToDelete.owner}`) {
       throw new AccessError('Нет прав на удаление карточки');
     } else {
+      const deletedCard = await Card.findByIdAndDelete(
+        req.params.cardId,
+      ).orFail(() => new NotFoundError('Карточка с указанным _id не найдена'));
       return res.status(200).send({
-        message: `Карточка ${cardToDelete._id} успешно удалена`,
+        message: `Карточка ${deletedCard._id} успешно удалена`,
       });
     }
   } catch (error) {

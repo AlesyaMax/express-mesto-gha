@@ -3,7 +3,7 @@ const User = require('../models/user');
 const NotFoundError = require('../utils/NotFoundError');
 const AuthError = require('../utils/AuthError');
 const ValidationError = require('../utils/ValidationError');
-const { generateToken } = require('../utils/jwt');
+const { generateToken } = require('../utils/config');
 const DuplicateError = require('../utils/DuplicateError');
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
@@ -118,7 +118,7 @@ module.exports.login = async (req, res, next) => {
     return res
       .status(200)
       .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-      .send({ data: { email: user.email, _id: user._id }, token });
+      .send({ data: { email: user.email, _id: user._id } });
   } catch (error) {
     next(error);
   }
