@@ -6,13 +6,14 @@ const cookieParser = require('cookie-parser');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./utils/NotFoundError');
+const { PORT, DB_URL, REGEX_URL } = require('./config');
+const { cardRouter, userRouter } = require('./routes/index');
+const { handleErrors } = require('./middlewares/errors');
 
 const app = express();
 app.use(express.json());
 
-const regexURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 });
 
@@ -34,7 +35,7 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(regexURL),
+      avatar: Joi.string().regex(REGEX_URL),
       email: Joi.string().email().required(),
       password: Joi.string().required(),
     }),
@@ -42,8 +43,10 @@ app.post(
   createUser,
 );
 
-app.use('/cards', auth, require('./routes/cards'));
-app.use('/users', auth, require('./routes/users'));
+app.use(auth);
+
+app.use(cardRouter);
+app.use(userRouter);
 
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
@@ -51,12 +54,6 @@ app.use('/', (req, res, next) => {
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-  next();
-});
+app.use(handleErrors);
 
-app.listen(3000);
+app.listen(PORT);

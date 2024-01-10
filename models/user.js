@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-
-const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const {
+  REGEX_URL,
+  DEFAULT_USER_NAME,
+  DEFAULT_ABOUT,
+  DEFAULT_AVATAR,
+} = require('../config');
 
 const userSchema = mongoose.Schema(
   {
@@ -9,13 +13,13 @@ const userSchema = mongoose.Schema(
       type: String,
       minlength: [2, 'Минимальная длина поля "name" - 2'],
       maxlength: [30, 'Максимальная длина поля "name" - 30'],
-      default: 'Жак-Ив Кусто',
+      default: DEFAULT_USER_NAME,
     },
     about: {
       type: String,
       minlength: [2, 'Минимальная длина поля "name" - 2'],
       maxlength: [30, 'Максимальная длина поля "name" - 30'],
-      default: 'Исследователь',
+      default: DEFAULT_ABOUT,
     },
     avatar: {
       type: String,
@@ -23,9 +27,8 @@ const userSchema = mongoose.Schema(
         validator: (v) => validator.isURL(v),
         message: 'Некорректный URL',
       },
-      default:
-        'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-      match: regex,
+      default: DEFAULT_AVATAR,
+      match: REGEX_URL,
     },
     email: {
       type: String,
