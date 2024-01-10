@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const AccessError = require('../utils/AccessError');
 const NotFoundError = require('../utils/NotFoundError');
+const ValidationError = require('../utils/ValidationError');
 
 module.exports.createCard = async (req, res, next) => {
   try {
@@ -10,9 +11,7 @@ module.exports.createCard = async (req, res, next) => {
     return res.send(newCard);
   } catch (error) {
     if (error.name === 'ValidationError') {
-      return res.status(400).send({
-        message: error.message,
-      });
+      return next(new ValidationError(error.message));
     }
     next(error);
   }
@@ -53,11 +52,6 @@ module.exports.likeCard = async (req, res, next) => {
     ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
     return res.send({ message: 'Лайк добавлен' });
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res.status(400).send({
-        message: 'Переданы некорректные данные для постановки лайка',
-      });
-    }
     next(error);
   }
 };
@@ -71,11 +65,6 @@ module.exports.dislikeCard = async (req, res, next) => {
     ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
     return res.send({ message: 'Лайк удален' });
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res.status(400).send({
-        message: 'Переданы некорректные данные для снятия лайка',
-      });
-    }
     next(error);
   }
 };

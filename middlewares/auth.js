@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     const validToken = token.replace('jwt=', '');
     payload = jwt.verify(validToken, 'dev_secret');
   } catch (error) {
-    next(error);
+    next(new AuthError('Необходимо авторизоваться'));
   }
   req.user = payload;
 

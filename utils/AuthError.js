@@ -1,8 +1,7 @@
 class AuthError extends Error {
   constructor(message) {
-    super();
+    super(message);
     this.statusCode = 401;
-    this.message = message;
     this.name = 'AuthError';
   }
 }

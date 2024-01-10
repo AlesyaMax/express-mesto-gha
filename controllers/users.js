@@ -2,7 +2,9 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../utils/NotFoundError');
 const AuthError = require('../utils/AuthError');
+const ValidationError = require('../utils/ValidationError');
 const { generateToken } = require('../utils/jwt');
+const DuplicateError = require('../utils/DuplicateError');
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 const SALT_ROUNDS = 10;
@@ -24,11 +26,6 @@ module.exports.getUserById = async (req, res, next) => {
     );
     return res.send(user);
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res
-        .status(400)
-        .send({ message: 'Переданы некорректные данные пользователя' });
-    }
     next(error);
   }
 };
@@ -55,14 +52,10 @@ module.exports.createUser = async (req, res, next) => {
     });
   } catch (error) {
     if (error.code === MONGO_DUPLICATE_ERROR_CODE) {
-      return res
-        .status(409)
-        .send({ message: 'Такой пользователь уже существует' });
+      return next(new DuplicateError('Такой пользователь уже существует'));
     }
     if (error.name === 'ValidationError') {
-      return res.status(400).send({
-        message: error.message,
-      });
+      return next(new ValidationError(error.message));
     }
     next(error);
   }
@@ -81,15 +74,10 @@ module.exports.editUserInfo = async (req, res, next) => {
     ).orFail(() => new NotFoundError('Пользователь с указанным _id не найден'));
     return res.send(updatedUser);
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res
-        .status(400)
-        .send({ message: 'Переданы некорректные данные пользователя' });
-    }
     if (error.name === 'ValidationError') {
-      return res.status(400).send({
-        message: 'Переданы некорректные данные при обновлении профиля',
-      });
+      return next(
+        new ValidationError('Переданы некорректные данные пользователя'),
+      );
     }
     next(error);
   }
@@ -107,15 +95,10 @@ module.exports.editAvatar = async (req, res, next) => {
     ).orFail(() => new NotFoundError('Пользователь с указанным _id не найден'));
     return res.send(updatedUser);
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res
-        .status(400)
-        .send({ message: 'Переданы некорректные данные пользователя' });
-    }
     if (error.name === 'ValidationError') {
-      return res.status(400).send({
-        message: 'Переданы некорректные данные при обновлении аватара',
-      });
+      return next(
+        new ValidationError('Переданы некорректные данные пользователя'),
+      );
     }
     next(error);
   }
@@ -164,11 +147,6 @@ module.exports.getUser = async (req, res, next) => {
 //       message: `Пользователь ${userToDelete._id}успешно удален`,
 //     });
 //   } catch (error) {
-//     if (error.name === 'CastError') {
-//       return res.status(400).send({
-//         message: 'Переданы некорректные данные для удаления пользователя',
-//       });
-//     }
 //     next(error);
 //   }
 // };
