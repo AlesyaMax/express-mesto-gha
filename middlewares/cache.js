@@ -5,11 +5,9 @@ const ValidationError = require('../utils/ValidationError');
 
 async function findUser(req, res, next, id) {
   try {
-    const user = await User.findById(id)
-      .select('+password')
-      .orFail(
-        () => new NotFoundError('Пользователь с указанным _id не найден'),
-      );
+    const user = await User.findById(id).orFail(
+      () => new NotFoundError('Пользователь с указанным _id не найден'),
+    );
     return user;
   } catch (error) {
     next(error);
