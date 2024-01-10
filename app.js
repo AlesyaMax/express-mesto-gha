@@ -1,49 +1,31 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./utils/NotFoundError');
+const { PORT, DB_URL } = require('./config');
+const { cardRouter, userRouter } = require('./routes/index');
+const { handleErrors } = require('./middlewares/errors');
+const { validateSignin, validateSignup } = require('./middlewares/validation');
 
 const app = express();
 app.use(express.json());
 
-const regexURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 });
 
 app.use(cookieParser());
 
-app.post(
-  '/signin',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-    }),
-  }),
-  login,
-);
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(regexURL),
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-    }),
-  }),
-  createUser,
-);
+app.post('/signin', validateSignin, login);
+app.post('/signup', validateSignup, createUser);
 
-app.use('/cards', auth, require('./routes/cards'));
-app.use('/users', auth, require('./routes/users'));
+app.use(auth);
+
+app.use(cardRouter);
+app.use(userRouter);
 
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
@@ -51,12 +33,6 @@ app.use('/', (req, res, next) => {
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-  next();
-});
+app.use(handleErrors);
 
-app.listen(3000);
+app.listen(PORT);

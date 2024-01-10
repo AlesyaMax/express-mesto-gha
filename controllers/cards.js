@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 const AccessError = require('../utils/AccessError');
 const NotFoundError = require('../utils/NotFoundError');
@@ -10,7 +11,7 @@ module.exports.createCard = async (req, res, next) => {
     const newCard = await Card.create({ name, link, owner: userId });
     return res.send(newCard);
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error instanceof mongoose.Error.ValidationError) {
       return next(new ValidationError(error.message));
     }
     next(error);
