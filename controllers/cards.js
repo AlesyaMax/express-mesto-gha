@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const AccessError = require('../utils/AccessError');
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
+const { updateCard } = require('../middlewares/search');
 
 module.exports.createCard = async (req, res, next) => {
   try {
@@ -45,28 +46,12 @@ module.exports.deleteCard = async (req, res, next) => {
   }
 };
 
-module.exports.likeCard = async (req, res, next) => {
-  try {
-    await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
-    return res.send({ message: 'Лайк добавлен' });
-  } catch (error) {
-    next(error);
-  }
+module.exports.likeCard = (req, res, next) => {
+  const newData = { $addToSet: { likes: req.user._id } };
+  return updateCard(req, res, next, newData);
 };
 
-module.exports.dislikeCard = async (req, res, next) => {
-  try {
-    await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
-    return res.send({ message: 'Лайк удален' });
-  } catch (error) {
-    next(error);
-  }
+module.exports.dislikeCard = (req, res, next) => {
+  const newData = { $pull: { likes: req.user._id } };
+  return updateCard(req, res, next, newData);
 };

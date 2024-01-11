@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const Card = require('../models/card');
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
 
@@ -33,7 +34,19 @@ async function updateUser(req, res, next, data) {
   }
 }
 
+async function updateCard(req, res, next, newData) {
+  try {
+    await Card.findByIdAndUpdate(req.params.cardId, newData, { new: true })
+      .orFail(() => new NotFoundError('Передан несуществующий _id карточки'))
+      .populate(['owner', 'likes']);
+    return res.status(200).send({ message: 'Обновление карточки выполнено' });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   findUser,
   updateUser,
+  updateCard,
 };
