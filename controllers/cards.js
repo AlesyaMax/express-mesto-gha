@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const AccessError = require('../utils/AccessError');
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
+const { updateCard } = require('../middlewares/search');
 
 module.exports.createCard = async (req, res, next) => {
   try {
@@ -35,11 +36,9 @@ module.exports.deleteCard = async (req, res, next) => {
     if (req.user._id !== `${cardToDelete.owner}`) {
       throw new AccessError('Нет прав на удаление карточки');
     } else {
-      const deletedCard = await Card.findByIdAndDelete(
-        req.params.cardId,
-      ).orFail(() => new NotFoundError('Карточка с указанным _id не найдена'));
+      await cardToDelete.deleteOne();
       return res.status(200).send({
-        message: `Карточка ${deletedCard._id} успешно удалена`,
+        message: `Карточка ${cardToDelete._id} успешно удалена`,
       });
     }
   } catch (error) {
@@ -48,27 +47,11 @@ module.exports.deleteCard = async (req, res, next) => {
 };
 
 module.exports.likeCard = async (req, res, next) => {
-  try {
-    await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
-    return res.send({ message: 'Лайк добавлен' });
-  } catch (error) {
-    next(error);
-  }
+  await updateCard(req, res, next, { $addToSet: { likes: req.user._id } });
+  return res.send({ message: 'Лайк добавлен' });
 };
 
 module.exports.dislikeCard = async (req, res, next) => {
-  try {
-    await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    ).orFail(() => new NotFoundError('Передан несуществующий _id карточки'));
-    return res.send({ message: 'Лайк удален' });
-  } catch (error) {
-    next(error);
-  }
+  await updateCard(req, res, next, { $pull: { likes: req.user._id } });
+  return res.send({ message: 'Лайк удален' });
 };
