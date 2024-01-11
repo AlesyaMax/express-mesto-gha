@@ -34,11 +34,12 @@ async function updateUser(req, res, next, data) {
   }
 }
 
-async function updateCard(req, res, next, data) {
+async function updateCard(req, res, next, newData) {
   try {
-    await Card.findByIdAndUpdate(req.params.cardId, data, { new: true }).orFail(
-      () => new NotFoundError('Передан несуществующий _id карточки'),
-    );
+    await Card.findByIdAndUpdate(req.params.cardId, newData, { new: true })
+      .orFail(() => new NotFoundError('Передан несуществующий _id карточки'))
+      .populate(['owner', 'likes']);
+    return res.status(200).send({ message: 'Обновление карточки выполнено' });
   } catch (error) {
     next(error);
   }

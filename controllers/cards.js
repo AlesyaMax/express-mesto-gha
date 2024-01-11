@@ -46,12 +46,12 @@ module.exports.deleteCard = async (req, res, next) => {
   }
 };
 
-module.exports.likeCard = async (req, res, next) => {
-  await updateCard(req, res, next, { $addToSet: { likes: req.user._id } });
-  return res.send({ message: 'Лайк добавлен' });
+module.exports.likeCard = (req, res, next) => {
+  const newData = { $addToSet: { likes: req.user._id } };
+  return updateCard(req, res, next, newData);
 };
 
-module.exports.dislikeCard = async (req, res, next) => {
-  await updateCard(req, res, next, { $pull: { likes: req.user._id } });
-  return res.send({ message: 'Лайк удален' });
+module.exports.dislikeCard = (req, res, next) => {
+  const newData = { $pull: { likes: req.user._id } };
+  return updateCard(req, res, next, newData);
 };
