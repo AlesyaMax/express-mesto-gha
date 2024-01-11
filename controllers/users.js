@@ -6,12 +6,7 @@ const ValidationError = require('../utils/ValidationError');
 const DuplicateError = require('../utils/DuplicateError');
 const { generateToken } = require('../utils/jwt');
 const { MONGO_DUPLICATE_ERROR_CODE, SALT_ROUNDS } = require('../config');
-const {
-  findCurrentUser,
-  findAnyUser,
-  updateUserInfo,
-  updateAvatar,
-} = require('../middlewares/cache');
+const { findUser, updateUser } = require('../middlewares/search');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -24,7 +19,7 @@ module.exports.getUsers = async (req, res, next) => {
 
 module.exports.getUserById = async (req, res, next) => {
   const { userId } = req.params;
-  const user = await findAnyUser(req, res, next, userId);
+  const user = await findUser(req, res, next, userId);
   return res.send(user);
 };
 
@@ -61,13 +56,13 @@ module.exports.createUser = async (req, res, next) => {
 
 module.exports.editUserInfo = async (req, res, next) => {
   const { name, about } = req.body;
-  const updatedUser = await updateUserInfo(req, res, next, { name, about });
+  const updatedUser = await updateUser(req, res, next, { name, about });
   return res.send(updatedUser);
 };
 
 module.exports.editAvatar = async (req, res, next) => {
   const { avatar } = req.body;
-  const updatedUser = await updateAvatar(req, res, next, { avatar });
+  const updatedUser = await updateUser(req, res, next, { avatar });
   return res.send(updatedUser);
 };
 
@@ -93,7 +88,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.getUser = async (req, res, next) => {
   const { _id } = req.user;
-  const user = await findCurrentUser(req, res, next, _id);
+  const user = await findUser(req, res, next, _id);
   return res.send(user);
 };
 
